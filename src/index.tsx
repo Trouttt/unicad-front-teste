@@ -5,10 +5,11 @@ import "semantic-ui-css/semantic.min.css";
 import reportWebVitals from "./reportWebVitals";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { Teste } from "./routes/listDelivery";
-
+import "react-toastify/dist/ReactToastify.css";
+import { ToastContainer } from "react-toastify";
 const router = createBrowserRouter([
   {
-    path: "/arroz",
+    path: "/",
     element: <Teste />,
   },
 ]);
@@ -19,6 +20,7 @@ const root = ReactDOM.createRoot(
 root.render(
   <React.StrictMode>
     <RouterProvider router={router} />
+    <ToastContainer />
   </React.StrictMode>
 );
 

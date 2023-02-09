@@ -1,40 +1,88 @@
 import {
   GoogleMap,
-  Marker,
   useJsApiLoader,
   DirectionsRenderer,
 } from "@react-google-maps/api";
-import React, { type SetStateAction, useEffect, useRef, useState } from "react";
-import {
-  Button,
-  Container,
-  Divider,
-  Grid,
-  Icon,
-  Menu,
-  Table,
-} from "semantic-ui-react";
+import React, { useEffect, useReducer, useState } from "react";
+import { Button, Container, Divider } from "semantic-ui-react";
 import Modal from "semantic-ui-react/dist/commonjs/modules/Modal";
 import { FormComponent } from "../../components/form";
 import { TableComponent } from "../../components/table";
+import { api } from "../../services/api";
+import { ToastContainer, toast } from "react-toastify";
+import formReducer from "../../reducers/registerDeliveryFormReducer";
+import { useParams } from "react-router-dom";
+import { useQuery } from "../../hooks/useQuery";
 
 interface ITravel {
   origin: string;
   destination: string;
 }
+interface IDelivery {
+  id: string;
+  name: string;
+  date: string;
+  origin: string;
+  destination: string;
+}
+
+interface IPagination {
+  has_next_page: false;
+  has_previous_page: false;
+  page: number;
+  page_count: number;
+  take: number;
+}
+
+interface ListProps {
+  data: IDelivery[];
+  pagination: IPagination;
+}
 
 export const Teste: React.FC = () => {
+  const page = useQuery().get("page");
+
+  const libraries = String(["places"]);
+  const { isLoaded } = useJsApiLoader({
+    id: "google-map-script",
+    googleMapsApiKey: `${process.env.REACT_APP_GOOGLE_MAPS_API_KEY!}`,
+    [libraries]: libraries,
+  });
+
+  const formInitialState = {
+    name_value: "",
+    date_value: "",
+    origin_value: "",
+    destination_value: "",
+
+    name_isValid: false,
+    date_isValid: false,
+    origin_isValid: false,
+    destination_isValid: false,
+
+    form_isValid: false,
+  };
+  const [formState, dispatchForm] = useReducer(formReducer, formInitialState);
+
+  const [formData, setFormData] = useState<IDelivery[]>([]);
   const [openFormModal, setOpenFormModal] = useState<boolean>(false);
   const [openMapModal, setOpenMapModal] = useState<boolean>(false);
   const [, setMap] = useState<unknown>(null);
   const [directionsResponse, setDirectionsResponse] =
     useState<google.maps.DirectionsResult | null>(null);
-  const calculateRoute = async ({
+  const [pagination, setPagination] = useState<IPagination>({
+    has_next_page: false,
+    has_previous_page: false,
+    page: 1,
+    page_count: 1,
+    take: 10,
+  });
+
+  const calculateRouteHandler = async ({
     origin,
     destination,
   }: ITravel): Promise<void> => {
     const directionsService = new google.maps.DirectionsService();
-
     const results = await directionsService.route({
       origin,
       destination,
@@ -43,32 +91,103 @@ export const Teste: React.FC = () => {
     setDirectionsResponse(results);
   };
 
-  const clearRoute = async (): Promise<void> => {
+  const clearRouteHandler = async (): Promise<void> => {
     setDirectionsResponse(null);
   };
 
-  const { isLoaded } = useJsApiLoader({
-    id: "google-map-script",
-    googleMapsApiKey: "AIzaSyCfcMKydB04tatWePmkKNmPoU1jyoyrfDw",
-    libraries: ["places"],
-  });
+  const nameChangeHandler = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ): void => {
+    dispatchForm({ type: "NAME_INPUT", val: event.target.value });
+  };
 
-  const rows = [
-    {
-      id: "1",
-      name: "alpha",
-      date: "pipi",
-      origin: "São Paulo",
-      destination: "Rio de Janeiro",
-    },
-    {
-      id: "2",
-      name: "alpha",
-      date: "pipi",
-      origin: "Recife",
-      destination: "Paraíba",
-    },
-  ];
+  const nameValidateHandler = (): void => {
+    dispatchForm({ type: "NAME_BLUR", val: formState.name_value });
+  };
+
+  const dateChangeHandler = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ): void => {
+    console.log(event.target.value);
+    dispatchForm({ type: "DATE_INPUT", val: event.target.value });
+    console.log(formState.date_value);
+  };
+
+  const dateValidateHandler = (): void => {
+    dispatchForm({ type: "DATE_BLUR", val: formState.date_value });
+  };
+
+  const originChangeHandler = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ): void => {
+    dispatchForm({ type: "ORIGIN_INPUT", val: event.target.value });
+  };
+
+  const originValidateHandler = (): void => {
+    dispatchForm({ type: "ORIGIN_BLUR", val: formState.origin_value });
+  };
+
+  const destinationChangeHandler = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ): void => {
+    dispatchForm({ type: "DESTINATION_INPUT", val: event.target.value });
+  };
+
+  const destinationValidateHandler = (): void => {
+    dispatchForm({
+      type: "DESTINATION_BLUR",
+      val: formState.destination_value,
+    });
+  };
+
+  const registerDeliveryHandler = async (
+    event: React.FormEvent
+  ): Promise<void> => {
+    event.preventDefault();
+
+    const body = {
+      name: formState.name_value,
+      date: formState.date_value,
+      origin: formState.origin_value,
+      destination: formState.destination_value,
+    };
+
+    try {
+      const response = await api.post("/deliveries", body);
+
+      if (response.status === 201)
+        toast.success("Cadastro realizado com sucesso", {
+          position: "top-right",
+        });
+
+      window.location.href = "/";
+    } catch (e: any) {
+      toast.error("Erro ao cadastrar");
+    }
+  };
+
+  const getDeliveriesHandler = async (page: number): Promise<void> => {
+    try {
+      const response = await api.get(
+        `/deliveries?page=${page === undefined ? 1 : page}`
+      );
+      console.log(response.data);
+      setFormData(response.data.data);
+      setPagination(response.data.meta_data);
+    } catch (e) {}
+  };
+  const handlePaginationChange = (e: any, { activePage }: any): void => {
+    setPagination((prevState) => ({ ...prevState, page: activePage }));
+    console.log(activePage);
+    console.log(pagination);
+  };
+
+  useEffect(() => {
+    void getDeliveriesHandler(pagination.page);
+  }, [pagination.page]);
+  useEffect(() => {
+    void getDeliveriesHandler(page !== null ? parseInt(page) : 1);
+  }, [page]);
   return (
     <Container>
       <Modal
@@ -97,7 +216,18 @@ export const Teste: React.FC = () => {
             Cancelar Cadastro
           </Button>
         </Modal.Header>
-        <FormComponent />
+        <FormComponent
+          form={formState}
+          onNameChangeHandler={nameChangeHandler}
+          onNameValidatorHandler={nameValidateHandler}
+          onDateChangeHandler={dateChangeHandler}
+          onDateValidatorHandler={dateValidateHandler}
+          onOriginChangeHandler={originChangeHandler}
+          onOriginValidatorHandler={originValidateHandler}
+          onDestinationChangeHandler={destinationChangeHandler}
+          onDestinationValidatorHandler={destinationValidateHandler}
+          onRegisterHandler={registerDeliveryHandler}
+        />
       </Modal>
       <Modal
         closeOnDimmerClick={false}
@@ -135,19 +265,19 @@ export const Teste: React.FC = () => {
             content="Fechar"
             onClick={() => {
               setOpenMapModal(false);
-              void clearRoute();
+              void clearRouteHandler();
             }}
           />
         </Modal.Actions>
       </Modal>
       <Divider />
       <TableComponent
-        openFormModal={openFormModal}
-        openMapModal={openMapModal}
-        deliveries={rows}
-        setOpenFormModal={setOpenFormModal}
+        onHandlerPaginationChange={handlePaginationChange}
+        setPagination={setPagination}
+        pagination={pagination}
+        deliveries={formData}
         setOpenMapModal={setOpenMapModal}
-        calculateRoute={calculateRoute}
+        onCalculateRoute={calculateRouteHandler}
       />
     </Container>
   );

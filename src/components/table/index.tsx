@@ -1,5 +1,12 @@
 import React from "react";
-import { Button, Icon, Menu, Modal, Table } from "semantic-ui-react";
+import {
+  Button,
+  Icon,
+  Menu,
+  Modal,
+  Pagination,
+  Table,
+} from "semantic-ui-react";
 import { FormComponent } from "../form";
 
 interface IRoute {
@@ -13,28 +20,35 @@ interface IDelivery extends IRoute {
   date: string;
 }
 
+interface IPagination {
+  has_next_page: false;
+  has_previous_page: false;
+  page: number;
+  take: number;
+  page_count: number;
+}
+
 interface IProps {
   deliveries: IDelivery[];
   setOpenMapModal: React.Dispatch<React.SetStateAction<boolean>>;
-  setOpenFormModal: React.Dispatch<React.SetStateAction<boolean>>;
-  calculateRoute: ({ origin, destination }: IRoute) => {};
-  openMapModal: boolean;
-  openFormModal: boolean;
+  onCalculateRoute: ({ origin, destination }: IRoute) => {};
+  pagination: IPagination;
+  setPagination: React.Dispatch<React.SetStateAction<IPagination>>;
+  onHandlerPaginationChange: (e: any, { activePage }: any) => void;
 }
 
 export const TableComponent: React.FC<IProps> = ({
-  openMapModal,
-  openFormModal,
   deliveries,
+  onHandlerPaginationChange,
   setOpenMapModal,
-  setOpenFormModal,
-  calculateRoute,
+  onCalculateRoute,
+  pagination,
 }) => {
   const columnData = deliveries.map((delivery) => (
     <Table.Row
       key={delivery.id}
       onClick={() => {
-        calculateRoute({
+        onCalculateRoute({
           origin: delivery.origin,
           destination: delivery.destination,
         });
@@ -45,10 +59,6 @@ export const TableComponent: React.FC<IProps> = ({
       <Table.Cell>{delivery.date}</Table.Cell>
       <Table.Cell>{delivery.origin}</Table.Cell>
       <Table.Cell>{delivery.destination}</Table.Cell>
-      <Table.Cell>
-        <Button>Atualizar</Button>
-        <Button>Deletar</Button>
-      </Table.Cell>
     </Table.Row>
   ));
 
@@ -60,7 +70,6 @@ export const TableComponent: React.FC<IProps> = ({
           <Table.HeaderCell>Date</Table.HeaderCell>
           <Table.HeaderCell>From</Table.HeaderCell>
           <Table.HeaderCell>To</Table.HeaderCell>
-          <Table.HeaderCell>Ações</Table.HeaderCell>
         </Table.Row>
       </Table.Header>
 
@@ -68,18 +77,17 @@ export const TableComponent: React.FC<IProps> = ({
       <Table.Footer>
         <Table.Row>
           <Table.HeaderCell colSpan="5">
-            <Menu floated="right" pagination>
-              <Menu.Item as="a" icon>
-                <Icon name="chevron left" />
-              </Menu.Item>
-              <Menu.Item as="a">1</Menu.Item>
-              <Menu.Item as="a">2</Menu.Item>
-              <Menu.Item as="a">3</Menu.Item>
-              <Menu.Item as="a">4</Menu.Item>
-              <Menu.Item as="a" icon>
-                <Icon name="chevron right" />
-              </Menu.Item>
-            </Menu>
+            <Pagination
+              onPageChange={onHandlerPaginationChange}
+              boundaryRange={0}
+              defaultActivePage={1}
+              ellipsisItem={null}
+              firstItem={null}
+              activePage={pagination.page}
+              lastItem={null}
+              siblingRange={2}
+              totalPages={pagination.page_count}
+            />
           </Table.HeaderCell>
         </Table.Row>
       </Table.Footer>
