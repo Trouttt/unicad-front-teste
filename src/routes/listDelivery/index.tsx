@@ -4,7 +4,7 @@ import {
   DirectionsRenderer,
 } from "@react-google-maps/api";
 import React, { useEffect, useReducer, useState } from "react";
-import { Button, Container, Divider } from "semantic-ui-react";
+import { Button, Container, Divider, Transition } from "semantic-ui-react";
 import Modal from "semantic-ui-react/dist/commonjs/modules/Modal";
 import { FormComponent } from "../../components/form";
 import { TableComponent } from "../../components/table";
@@ -27,19 +27,14 @@ interface IDelivery {
 }
 
 interface IPagination {
-  has_next_page: false;
-  has_previous_page: false;
+  has_next_page: boolean;
+  has_previous_page: boolean;
   page: number;
   page_count: number;
   take: number;
 }
 
-interface ListProps {
-  data: IDelivery[];
-  pagination: IPagination;
-}
-
-export const Teste: React.FC = () => {
+export const ListDeliveryRoute: React.FC = () => {
   const page = useQuery().get("page");
 
   const libraries = String(["places"]);

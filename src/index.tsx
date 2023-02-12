@@ -4,13 +4,13 @@ import "./index.css";
 import "semantic-ui-css/semantic.min.css";
 import reportWebVitals from "./reportWebVitals";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import { Teste } from "./routes/listDelivery";
+import { ListDeliveryRoute } from "./routes/listDelivery";
 import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer } from "react-toastify";
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <Teste />,
+    element: <ListDeliveryRoute />,
   },
 ]);
 

@@ -1,13 +1,5 @@
 import React from "react";
-import {
-  Button,
-  Icon,
-  Menu,
-  Modal,
-  Pagination,
-  Table,
-} from "semantic-ui-react";
-import { FormComponent } from "../form";
+import { Pagination, Table } from "semantic-ui-react";
 
 interface IRoute {
   origin: string;
@@ -21,8 +13,8 @@ interface IDelivery extends IRoute {
 }
 
 interface IPagination {
-  has_next_page: false;
-  has_previous_page: false;
+  has_next_page: boolean;
+  has_previous_page: boolean;
   page: number;
   take: number;
   page_count: number;
@@ -31,7 +23,7 @@ interface IPagination {
 interface IProps {
   deliveries: IDelivery[];
   setOpenMapModal: React.Dispatch<React.SetStateAction<boolean>>;
-  onCalculateRoute: ({ origin, destination }: IRoute) => {};
+  onCalculateRoute: ({ origin, destination }: IRoute) => void;
   pagination: IPagination;
   setPagination: React.Dispatch<React.SetStateAction<IPagination>>;
   onHandlerPaginationChange: (e: any, { activePage }: any) => void;
@@ -78,6 +70,7 @@ export const TableComponent: React.FC<IProps> = ({
         <Table.Row>
           <Table.HeaderCell colSpan="5">
             <Pagination
+              id="pagination"
               onPageChange={onHandlerPaginationChange}
               boundaryRange={0}
               defaultActivePage={1}
