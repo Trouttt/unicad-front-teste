@@ -103,9 +103,7 @@ export const ListDeliveryRoute: React.FC = () => {
   const dateChangeHandler = (
     event: React.ChangeEvent<HTMLInputElement>
   ): void => {
-    console.log(event.target.value);
     dispatchForm({ type: "DATE_INPUT", val: event.target.value });
-    console.log(formState.date_value);
   };
 
   const dateValidateHandler = (): void => {
@@ -133,6 +131,11 @@ export const ListDeliveryRoute: React.FC = () => {
       type: "DESTINATION_BLUR",
       val: formState.destination_value,
     });
+  };
+
+  const closeModalHandler = (): void => {
+    setOpenFormModal(false);
+    dispatchForm({ type: "default", val: "" });
   };
 
   const registerDeliveryHandler = async (
@@ -166,15 +169,13 @@ export const ListDeliveryRoute: React.FC = () => {
       const response = await api.get(
         `/deliveries?page=${page === undefined ? 1 : page}`
       );
-      console.log(response.data);
+
       setFormData(response.data.data);
       setPagination(response.data.meta_data);
     } catch (e) {}
   };
   const handlePaginationChange = (e: any, { activePage }: any): void => {
     setPagination((prevState) => ({ ...prevState, page: activePage }));
-    console.log(activePage);
-    console.log(pagination);
   };
 
   useEffect(() => {
@@ -194,9 +195,10 @@ export const ListDeliveryRoute: React.FC = () => {
         onOpen={() => {
           setOpenFormModal(true);
         }}
+        id="modalForm"
         open={openFormModal}
         trigger={
-          <Button style={{ margin: "2vh 0vw" }} primary>
+          <Button data-tes style={{ margin: "2vh 0vw" }} primary>
             Cadastrar Entrega
           </Button>
         }
@@ -204,7 +206,7 @@ export const ListDeliveryRoute: React.FC = () => {
         <Modal.Header>
           <Button
             onClick={() => {
-              setOpenFormModal(false);
+              closeModalHandler();
             }}
             negative
           >

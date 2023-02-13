@@ -73,7 +73,6 @@ export const TableComponent: React.FC<IProps> = ({
               id="pagination"
               onPageChange={onHandlerPaginationChange}
               boundaryRange={0}
-              defaultActivePage={1}
               ellipsisItem={null}
               firstItem={null}
               activePage={pagination.page}
