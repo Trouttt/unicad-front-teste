@@ -174,7 +174,7 @@ export const ListDeliveryRoute: React.FC = () => {
       const response = await api.get(
         `/deliveries?page=${page === undefined ? 1 : page}`
       );
-      console.log(response.data, "eita aiai papito");
+      console.log(response.data, "eita tudo bom");
       setFormData(response.data.data);
       setPagination(response.data.meta_data);
     } catch (e: any) {
