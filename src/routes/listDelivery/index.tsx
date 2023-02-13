@@ -151,7 +151,15 @@ export const ListDeliveryRoute: React.FC = () => {
     };
 
     try {
-      const response = await api.post("/deliveries", body);
+      const response = await api.post("/deliveries", body, {
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Headers": "Authorization",
+          "Access-Control-Allow-Methods":
+            "GET, POST, OPTIONS, PUT, PATCH, DELETE",
+          "Content-Type": "application/json;charset=UTF-8",
+        },
+      });
       console.log(response);
       if (response.status === 201)
         toast.success("Cadastro realizado com sucesso", {
