@@ -152,7 +152,7 @@ export const ListDeliveryRoute: React.FC = () => {
 
     try {
       const response = await api.post("/deliveries", body);
-
+      console.log(response);
       if (response.status === 201)
         toast.success("Cadastro realizado com sucesso", {
           position: "top-right",
@@ -160,6 +160,7 @@ export const ListDeliveryRoute: React.FC = () => {
 
       window.location.href = "/";
     } catch (e: any) {
+      console.log(e, "erro");
       toast.error("Erro ao cadastrar");
     }
   };
