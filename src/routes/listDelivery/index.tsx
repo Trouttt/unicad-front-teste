@@ -153,6 +153,7 @@ export const ListDeliveryRoute: React.FC = () => {
     try {
       const response = await api.post("/deliveries", body, {
         headers: {
+          "Access-Control-Allow-Origin": "*",
           "Content-Type": "application/json",
         },
       });
