@@ -174,10 +174,12 @@ export const ListDeliveryRoute: React.FC = () => {
       const response = await api.get(
         `/deliveries?page=${page === undefined ? 1 : page}`
       );
-
+      console.log(response.data, "eita aiai papito");
       setFormData(response.data.data);
       setPagination(response.data.meta_data);
-    } catch (e) {}
+    } catch (e: any) {
+      console.log(e.response.data);
+    }
   };
   const handlePaginationChange = (e: any, { activePage }: any): void => {
     setPagination((prevState) => ({ ...prevState, page: activePage }));
