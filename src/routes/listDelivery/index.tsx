@@ -152,6 +152,7 @@ export const ListDeliveryRoute: React.FC = () => {
 
     try {
       const response = await api.post("/deliveries", body, {
+        withCredentials: true,
         headers: {
           "Content-Type": "application/json",
         },
@@ -174,12 +175,10 @@ export const ListDeliveryRoute: React.FC = () => {
       const response = await api.get(
         `/deliveries?page=${page === undefined ? 1 : page}`
       );
-      console.log(response.data, "eita tudo bom");
+
       setFormData(response.data.data);
       setPagination(response.data.meta_data);
-    } catch (e: any) {
-      console.log(e.response.data);
-    }
+    } catch (e: any) {}
   };
   const handlePaginationChange = (e: any, { activePage }: any): void => {
     setPagination((prevState) => ({ ...prevState, page: activePage }));
