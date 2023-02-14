@@ -1,3 +1,4 @@
+import { Autocomplete } from "@react-google-maps/api";
 import React from "react";
 import { Button, Container, Form } from "semantic-ui-react";
 
@@ -54,6 +55,7 @@ export const FormComponent: React.FC<IProps> = ({
         </Form.Field>
         <Form.Field>
           <label>Data</label>
+
           <input
             value={form.date_value}
             onChange={onDateChangeHandler}
@@ -62,6 +64,7 @@ export const FormComponent: React.FC<IProps> = ({
             placeholder="Ex: 20/10/2023"
           />
         </Form.Field>
+
         <Form.Field>
           <label>Origem</label>
           <input
@@ -71,8 +74,10 @@ export const FormComponent: React.FC<IProps> = ({
             placeholder="Ex: Rua Tiradentes de oliveira"
           />
         </Form.Field>
+
         <Form.Field>
           <label>Destino</label>
+
           <input
             value={form.destination_value}
             onChange={onDestinationChangeHandler}
@@ -80,6 +85,7 @@ export const FormComponent: React.FC<IProps> = ({
             placeholder="Ex: Rua Dom Pedro Japão"
           />
         </Form.Field>
+
         <Button color="green" type="submit">
           Cadastrar
         </Button>

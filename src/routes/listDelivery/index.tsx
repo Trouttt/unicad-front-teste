@@ -2,9 +2,16 @@ import {
   GoogleMap,
   useJsApiLoader,
   DirectionsRenderer,
+  LoadScript,
 } from "@react-google-maps/api";
 import React, { useEffect, useReducer, useState } from "react";
-import { Button, Container, Divider, Transition } from "semantic-ui-react";
+import {
+  Button,
+  Container,
+  Divider,
+  Select,
+  Transition,
+} from "semantic-ui-react";
 import Modal from "semantic-ui-react/dist/commonjs/modules/Modal";
 import { FormComponent } from "../../components/form";
 import { TableComponent } from "../../components/table";
@@ -18,6 +25,7 @@ interface ITravel {
   origin: string;
   destination: string;
 }
+
 interface IDelivery {
   id: string;
   name: string;
@@ -77,13 +85,27 @@ export const ListDeliveryRoute: React.FC = () => {
     origin,
     destination,
   }: ITravel): Promise<void> => {
-    const directionsService = new google.maps.DirectionsService();
-    const results = await directionsService.route({
-      origin,
-      destination,
-      travelMode: google.maps.TravelMode.DRIVING,
-    });
-    setDirectionsResponse(results);
+    try {
+      const directionsService = new google.maps.DirectionsService();
+      const results = await directionsService.route({
+        origin,
+        destination,
+        travelMode: google.maps.TravelMode.DRIVING,
+      });
+
+      setDirectionsResponse(results);
+    } catch (e: any) {
+      if (e.code === "ZERO_RESULTS") {
+        toast.warning("Não é possível fazer esse percurso");
+      }
+      if (e.code === "NOT_FOUND") {
+        toast.error("Um ou ambos endereços não existem", {
+          position: "top-right",
+        });
+      }
+      setOpenMapModal(false);
+      void clearRouteHandler();
+    }
   };
 
   const clearRouteHandler = async (): Promise<void> => {
@@ -155,14 +177,13 @@ export const ListDeliveryRoute: React.FC = () => {
         method: "POST",
         headers: { "Content-Type": "application/json" },
       });
-      console.log(response);
+
       if (response.status === 201)
         toast.success("Cadastro realizado com sucesso", {
           position: "top-right",
         });
       window.location.href = "/";
     } catch (e: any) {
-      console.log(e, "erro");
       toast.error("Erro ao cadastrar");
     }
   };
