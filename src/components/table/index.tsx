@@ -39,6 +39,7 @@ export const TableComponent: React.FC<IProps> = ({
   const columnData = deliveries.map((delivery) => (
     <Table.Row
       key={delivery.id}
+      style={{ cursor: "pointer" }}
       onClick={() => {
         onCalculateRoute({
           origin: delivery.origin,
