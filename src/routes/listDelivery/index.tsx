@@ -157,7 +157,6 @@ export const ListDeliveryRoute: React.FC = () => {
         toast.success("Cadastro realizado com sucesso", {
           position: "top-right",
         });
-
       window.location.href = "/";
     } catch (e: any) {
       console.log(e, "erro");
